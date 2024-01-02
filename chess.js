@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var board = document.createElement('div');
     board.draggable = false;
     function resizeBoard() {
-        var height = document.body.clientHeight;
-        var width = document.body.clientWidth;
+        var height = window.innerHeight;
+        var width = window.innerWidth;
         board.style.width = board.style.height = Math.min(height, width) + 'px';
         board.style.left = (width - Math.min(height, width)) / 2 + 'px';
         board.style.top = (height - Math.min(height, width)) / 2 + 'px';
@@ -159,8 +159,8 @@ document.addEventListener("DOMContentLoaded", function () {
         let toSQ = [toSquare.id.charAt(0), toSquare.id.charAt(1)];
         let x = parseInt(toSQ[0]) - parseInt(fromSQ[0]);
         let y = parseInt(toSQ[1]) - parseInt(fromSQ[1]);
-        switch (piece.id) {
-            case 'k': case 'K':
+        switch (piece.id.toLowerCase()) {
+            case 'k':
                 if (Math.abs(x) <= 1 && Math.abs(y) <= 1) return true;
                 if (Math.abs(x) == 2 && y == 0 && piece.canCastle) {
                     let rook = squares[nn_i((x == 2 ? '8' : '1') + fromSQ[1])].children[0];
@@ -168,35 +168,39 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (isRook && rook.canCastle && pathEmpty(fromSQ, (x == 2 ? 3 : -4), y)) return true;
                 }
                 return false;
-            case 'n': case 'N': return Math.abs(x) + Math.abs(y) == 3 && x * y != 0;
-            case 'p':
-                if (((x == 1 && y == -1) || (x == -1 && y == -1))) {
-                    if (!toSquare.isEmpty()) return true; // Eat standard
-                    if (fromSQ[1] == 4) { // Eat en passant
-                        let sqPassant = squares[nn_i(toSQ[0] + '' + fromSQ[1])];
-                        if (sqPassant.isEmpty()) return false;
-                        if (sqPassant.children[0].id == 'P' && sqPassant.children[0].movex2) return true;
-                    }
+            case 'n': return Math.abs(x) + Math.abs(y) == 3 && x * y != 0;
+            case 'p': return isLegalPawnMove(piece, x, y, fromSQ, toSQ, toSquare);
+            case 'b': return (x == y || x == -y) && pathEmpty(fromSQ, x, y);
+            case 'q': return (x == y || x == -y || x == 0 || y == 0) && pathEmpty(fromSQ, x, y);
+            case 'r': return (x == 0 || y == 0) && pathEmpty(fromSQ, x, y);
+        }
+    }
+
+    function isLegalPawnMove(piece, x, y, fromSQ, toSQ, toSquare) {
+        if (piece.id == 'p') {
+            if (((x == 1 && y == -1) || (x == -1 && y == -1))) {
+                if (!toSquare.isEmpty()) return true; // Eat standard
+                if (fromSQ[1] == 4) { // Eat en passant
+                    let sqPassant = squares[nn_i(toSQ[0] + '' + fromSQ[1])];
+                    if (sqPassant.isEmpty()) return false;
+                    if (sqPassant.children[0].id == 'P' && sqPassant.children[0].movex2) return true;
                 }
-                if ((x == 0 && y == -1) && toSquare.isEmpty()) return true; // Move Forward 1
-                if (fromSQ[1] == 7 && y == -2 && x == 0 && pathEmpty(fromSQ, x, y - 1)) return true; // Move forward 2
-                return false;
-            case 'P':
-                if (((x == 1 && y == 1) || (x == -1 && y == 1))) {
-                    if (!toSquare.isEmpty()) return true; // Eat standard
-                    if (fromSQ[1] == 5) { // Eat en passant
-                        let sqPassant = squares[nn_i(toSQ[0] + '' + fromSQ[1])];
-                        if (sqPassant.isEmpty()) return false;
-                        if (sqPassant.children[0].id == 'p' && sqPassant.children[0].movex2) return true;
-                    }
+            }
+            if ((x == 0 && y == -1) && toSquare.isEmpty()) return true; // Move Forward 1
+            if (fromSQ[1] == 7 && y == -2 && x == 0 && pathEmpty(fromSQ, x, y - 1)) return true; // Move forward 2
+            return false;
+        } else {
+            if (((x == 1 && y == 1) || (x == -1 && y == 1))) {
+                if (!toSquare.isEmpty()) return true; // Eat standard
+                if (fromSQ[1] == 5) { // Eat en passant
+                    let sqPassant = squares[nn_i(toSQ[0] + '' + fromSQ[1])];
+                    if (sqPassant.isEmpty()) return false;
+                    if (sqPassant.children[0].id == 'p' && sqPassant.children[0].movex2) return true;
                 }
-                //  && !toSquare.isEmpty()) return true; // Eat standard
-                if ((x == 0 && y == 1) && toSquare.isEmpty()) return true; // Move Forward 1
-                if (fromSQ[1] == 2 && y == 2 && x == 0 && pathEmpty(fromSQ, x, y + 1)) return true; // Move forward 2
-                return false;
-            case 'b': case 'B': return (x == y || x == -y) && pathEmpty(fromSQ, x, y);
-            case 'q': case 'Q': return (x == y || x == -y || x == 0 || y == 0) && pathEmpty(fromSQ, x, y);
-            case 'r': case 'R': return (x == 0 || y == 0) && pathEmpty(fromSQ, x, y);
+            }
+            if ((x == 0 && y == 1) && toSquare.isEmpty()) return true; // Move Forward 1
+            if (fromSQ[1] == 2 && y == 2 && x == 0 && pathEmpty(fromSQ, x, y + 1)) return true; // Move forward 2
+            return false;
         }
     }
 
