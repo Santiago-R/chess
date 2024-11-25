@@ -123,12 +123,15 @@ document.addEventListener("DOMContentLoaded", function () {
     var legal_squares = [];
     newLegalCircle = () => {
         var c = document.createElement('img');
-        c.src = 'https://swain.com/wp-content/uploads/2016/01/1000px-Ski_trail_rating_symbol-green_circle.svg_.png';
+        c.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="green" opacity="0.3"/>
+            </svg>
+        `);
         c.className = 'legal';
         c.style.position = 'absolute';
         c.style.width = c.style.height = '40%';
         c.style.left = c.style.top = '30%';
-        c.style.opacity = 0.3;
         c.style.pointerEvents = 'none'
         return c;
     }
