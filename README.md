@@ -1,5 +1,4 @@
-# Republican Chess
-Play chess with a friend, in person.  
-You get to eat the King!  
-  
-### [**Play**](https://santiago-r.github.io/RepublicanChess/chess.html)
+# Chess
+
+### Play chess with a friend, in person.
+### [**Play**](https://santiago-r.github.io/chess/chess.html)
